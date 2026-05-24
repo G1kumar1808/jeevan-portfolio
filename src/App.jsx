@@ -68,7 +68,7 @@ const PROJECTS = [
     gradient: "from-violet-600 to-indigo-600",
     accent: "#818cf8",
     glow: "rgba(99,102,241,0.3)",
-    github: "https://github.com/G1kumar1808/happy-tails",
+    github: "https://github.com/akshay-ellendula/Happytails-react",
     live: null,
   },
   {
@@ -80,7 +80,7 @@ const PROJECTS = [
     gradient: "from-amber-500 to-orange-600",
     accent: "#fbbf24",
     glow: "rgba(245,158,11,0.3)",
-    github: "https://github.com/G1kumar1808/secure-task-manager",
+    github: "https://github.com/G1kumar1808/Task-Management-System",
     live: null,
   },
   {
