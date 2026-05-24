@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import emailjs from "@emailjs/browser";
 
 // ─── DATA ───────────────────────────────────────────────────────────────────
 
@@ -67,7 +68,7 @@ const PROJECTS = [
     gradient: "from-violet-600 to-indigo-600",
     accent: "#818cf8",
     glow: "rgba(99,102,241,0.3)",
-    github: "https://github.com/jeevankumar-y",
+    github: "https://github.com/G1kumar1808/happy-tails",
     live: null,
   },
   {
@@ -79,7 +80,7 @@ const PROJECTS = [
     gradient: "from-amber-500 to-orange-600",
     accent: "#fbbf24",
     glow: "rgba(245,158,11,0.3)",
-    github: "https://github.com/jeevankumar-y",
+    github: "https://github.com/G1kumar1808/secure-task-manager",
     live: null,
   },
   {
@@ -91,7 +92,7 @@ const PROJECTS = [
     gradient: "from-teal-500 to-cyan-600",
     accent: "#2dd4bf",
     glow: "rgba(20,184,166,0.3)",
-    github: "https://github.com/jeevankumar-y",
+    github: "https://github.com/G1kumar1808/fake-news-detector",
     live: null,
   },
 ];
@@ -1462,12 +1463,44 @@ function Achievements() {
   );
 }
 
+// ── EmailJS config ─────────────────────────────────────────────────────────
+// Sign up at https://www.emailjs.com → create a service + template → paste IDs below
+const EMAILJS_SERVICE_ID  = "service_portfolio";   // ← replace with your Service ID
+const EMAILJS_TEMPLATE_ID = "template_contact";    // ← replace with your Template ID
+const EMAILJS_PUBLIC_KEY  = "YOUR_PUBLIC_KEY";     // ← replace with your Public Key
+// Template variables expected: {{from_name}}, {{from_email}}, {{message}}
+
 function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [sent, setSent] = useState(false);
-  const submit = () => {
-    if (!form.name || !form.email || !form.message) return;
-    setSent(true);
+  const [form, setForm]     = useState({ name: "", email: "", message: "" });
+  const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim())    e.name    = "Name is required";
+    if (!form.email.trim())   e.email   = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+                              e.email   = "Enter a valid email";
+    if (!form.message.trim()) e.message = "Message is required";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const submit = async () => {
+    if (!validate()) return;
+    setStatus("sending");
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        { from_name: form.name, from_email: form.email, message: form.message },
+        EMAILJS_PUBLIC_KEY,
+      );
+      setStatus("sent");
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      setStatus("error");
+    }
   };
   return (
     <section
@@ -1564,135 +1597,7 @@ function Contact() {
             ))}
           </div>
 
-          {!sent ? (
-            <div
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 20,
-                padding: "36px",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 16,
-                  marginBottom: 16,
-                }}
-              >
-                {[
-                  { key: "name", placeholder: "Your name", label: "Name" },
-                  {
-                    key: "email",
-                    placeholder: "your@email.com",
-                    label: "Email",
-                  },
-                ].map((f) => (
-                  <div key={f.key}>
-                    <label
-                      style={{
-                        fontFamily: "'Space Mono',monospace",
-                        fontSize: 10,
-                        color: "#818cf8",
-                        letterSpacing: "0.08em",
-                        display: "block",
-                        marginBottom: 6,
-                      }}
-                    >
-                      {f.label.toUpperCase()}
-                    </label>
-                    <input
-                      value={form[f.key]}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, [f.key]: e.target.value }))
-                      }
-                      placeholder={f.placeholder}
-                      style={{
-                        width: "100%",
-                        background: "rgba(255,255,255,0.05)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: 10,
-                        padding: "12px 14px",
-                        color: "#f1f5f9",
-                        fontSize: 14,
-                        fontFamily: "'Space Mono',monospace",
-                        outline: "none",
-                        boxSizing: "border-box",
-                        transition: "border-color 0.2s",
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = "#818cf8")}
-                      onBlur={(e) =>
-                        (e.target.style.borderColor = "rgba(255,255,255,0.1)")
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginBottom: 20 }}>
-                <label
-                  style={{
-                    fontFamily: "'Space Mono',monospace",
-                    fontSize: 10,
-                    color: "#818cf8",
-                    letterSpacing: "0.08em",
-                    display: "block",
-                    marginBottom: 6,
-                  }}
-                >
-                  MESSAGE
-                </label>
-                <textarea
-                  value={form.message}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, message: e.target.value }))
-                  }
-                  placeholder="Tell me about your project or opportunity..."
-                  rows={5}
-                  style={{
-                    width: "100%",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 10,
-                    padding: "12px 14px",
-                    color: "#f1f5f9",
-                    fontSize: 14,
-                    fontFamily: "'Space Mono',monospace",
-                    outline: "none",
-                    resize: "vertical",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.2s",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#818cf8")}
-                  onBlur={(e) =>
-                    (e.target.style.borderColor = "rgba(255,255,255,0.1)")
-                  }
-                />
-              </div>
-              <button
-                onClick={submit}
-                style={{
-                  width: "100%",
-                  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 10,
-                  padding: "14px",
-                  fontSize: 14,
-                  fontFamily: "'Space Mono',monospace",
-                  cursor: "pointer",
-                  fontWeight: 700,
-                  transition: "all 0.2s",
-                  boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
-                }}
-                onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
-                onMouseLeave={(e) => (e.target.style.opacity = "1")}
-              >
-                Send Message →
-              </button>
-            </div>
-          ) : (
+          {status === "sent" ? (
             <div
               style={{
                 background: "rgba(34,197,94,0.08)",
@@ -1716,6 +1621,204 @@ function Contact() {
               <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14 }}>
                 Thanks for reaching out. I'll get back to you within 24 hours.
               </p>
+              <button
+                onClick={() => { setStatus("idle"); setForm({ name: "", email: "", message: "" }); }}
+                style={{
+                  marginTop: 24,
+                  background: "rgba(34,197,94,0.15)",
+                  border: "1px solid rgba(34,197,94,0.4)",
+                  color: "#22c55e",
+                  borderRadius: 8,
+                  padding: "10px 24px",
+                  fontFamily: "'Space Mono',monospace",
+                  fontSize: 13,
+                  cursor: "pointer",
+                  fontWeight: 700,
+                }}
+              >
+                Send Another →
+              </button>
+            </div>
+          ) : (
+            <div
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 20,
+                padding: "36px",
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              {status === "error" && (
+                <div
+                  style={{
+                    background: "rgba(239,68,68,0.1)",
+                    border: "1px solid rgba(239,68,68,0.35)",
+                    borderRadius: 10,
+                    padding: "12px 16px",
+                    marginBottom: 20,
+                    color: "#f87171",
+                    fontFamily: "'Space Mono',monospace",
+                    fontSize: 12,
+                  }}
+                >
+                  ⚠️ Failed to send. Please email me directly at jeevankumar.y23@iiits.in
+                </div>
+              )}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 16,
+                  marginBottom: 16,
+                }}
+              >
+                {[
+                  { key: "name", placeholder: "Your name", label: "Name", type: "text" },
+                  { key: "email", placeholder: "your@email.com", label: "Email", type: "email" },
+                ].map((f) => (
+                  <div key={f.key}>
+                    <label
+                      style={{
+                        fontFamily: "'Space Mono',monospace",
+                        fontSize: 10,
+                        color: errors[f.key] ? "#f87171" : "#818cf8",
+                        letterSpacing: "0.08em",
+                        display: "block",
+                        marginBottom: 6,
+                      }}
+                    >
+                      {f.label.toUpperCase()}
+                      {errors[f.key] && (
+                        <span style={{ marginLeft: 8, fontWeight: 400 }}>
+                          — {errors[f.key]}
+                        </span>
+                      )}
+                    </label>
+                    <input
+                      type={f.type}
+                      value={form[f.key]}
+                      onChange={(e) => {
+                        setForm((p) => ({ ...p, [f.key]: e.target.value }));
+                        if (errors[f.key]) setErrors((p) => ({ ...p, [f.key]: "" }));
+                      }}
+                      placeholder={f.placeholder}
+                      style={{
+                        width: "100%",
+                        background: "rgba(255,255,255,0.05)",
+                        border: `1px solid ${errors[f.key] ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+                        borderRadius: 10,
+                        padding: "12px 14px",
+                        color: "#f1f5f9",
+                        fontSize: 14,
+                        fontFamily: "'Space Mono',monospace",
+                        outline: "none",
+                        boxSizing: "border-box",
+                        transition: "border-color 0.2s",
+                      }}
+                      onFocus={(e) =>
+                        (e.target.style.borderColor = errors[f.key] ? "rgba(239,68,68,0.7)" : "#818cf8")
+                      }
+                      onBlur={(e) =>
+                        (e.target.style.borderColor = errors[f.key] ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)")
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label
+                  style={{
+                    fontFamily: "'Space Mono',monospace",
+                    fontSize: 10,
+                    color: errors.message ? "#f87171" : "#818cf8",
+                    letterSpacing: "0.08em",
+                    display: "block",
+                    marginBottom: 6,
+                  }}
+                >
+                  MESSAGE
+                  {errors.message && (
+                    <span style={{ marginLeft: 8, fontWeight: 400 }}>
+                      — {errors.message}
+                    </span>
+                  )}
+                </label>
+                <textarea
+                  value={form.message}
+                  onChange={(e) => {
+                    setForm((p) => ({ ...p, message: e.target.value }));
+                    if (errors.message) setErrors((p) => ({ ...p, message: "" }));
+                  }}
+                  placeholder="Tell me about your project or opportunity..."
+                  rows={5}
+                  style={{
+                    width: "100%",
+                    background: "rgba(255,255,255,0.05)",
+                    border: `1px solid ${errors.message ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+                    borderRadius: 10,
+                    padding: "12px 14px",
+                    color: "#f1f5f9",
+                    fontSize: 14,
+                    fontFamily: "'Space Mono',monospace",
+                    outline: "none",
+                    resize: "vertical",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.2s",
+                  }}
+                  onFocus={(e) =>
+                    (e.target.style.borderColor = errors.message ? "rgba(239,68,68,0.7)" : "#818cf8")
+                  }
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = errors.message ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)")
+                  }
+                />
+              </div>
+              <button
+                onClick={submit}
+                disabled={status === "sending"}
+                style={{
+                  width: "100%",
+                  background: status === "sending"
+                    ? "rgba(99,102,241,0.4)"
+                    : "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "14px",
+                  fontSize: 14,
+                  fontFamily: "'Space Mono',monospace",
+                  cursor: status === "sending" ? "not-allowed" : "pointer",
+                  fontWeight: 700,
+                  transition: "all 0.2s",
+                  boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+                onMouseEnter={(e) => { if (status !== "sending") e.currentTarget.style.opacity = "0.9"; }}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+              >
+                {status === "sending" ? (
+                  <>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 14,
+                        height: 14,
+                        border: "2px solid rgba(255,255,255,0.3)",
+                        borderTopColor: "#fff",
+                        borderRadius: "50%",
+                        animation: "spin 0.7s linear infinite",
+                      }}
+                    />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Message →"
+                )}
+              </button>
             </div>
           )}
         </RevealSection>
@@ -1789,6 +1892,7 @@ export default function Portfolio() {
         @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0 } }
         @keyframes floatOrb { from { transform: translateY(0) scale(1); } to { transform: translateY(-30px) scale(1.05); } }
         @keyframes scrollPulse { 0%,100% { opacity:0.3 } 50% { opacity:0.9 } }
+        @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
           .desktop-nav { display: none !important; }
           .mobile-burger { display: block !important; }
