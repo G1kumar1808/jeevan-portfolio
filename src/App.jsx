@@ -92,7 +92,7 @@ const PROJECTS = [
     gradient: "from-teal-500 to-cyan-600",
     accent: "#2dd4bf",
     glow: "rgba(20,184,166,0.3)",
-    github: "https://github.com/G1kumar1808/fake-news-detector",
+    github: "https://github.com/G1kumar1808",
     live: null,
   },
 ];
