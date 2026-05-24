@@ -1465,9 +1465,9 @@ function Achievements() {
 
 // ── EmailJS config ─────────────────────────────────────────────────────────
 // Sign up at https://www.emailjs.com → create a service + template → paste IDs below
-const EMAILJS_SERVICE_ID  = "service_portfolio";   // ← replace with your Service ID
-const EMAILJS_TEMPLATE_ID = "template_contact";    // ← replace with your Template ID
-const EMAILJS_PUBLIC_KEY  = "YOUR_PUBLIC_KEY";     // ← replace with your Public Key
+const EMAILJS_SERVICE_ID  = "service_0n3wx3x";   // ← replace with your Service ID
+const EMAILJS_TEMPLATE_ID = "template_7kjgxr6";    // ← replace with your Template ID
+const EMAILJS_PUBLIC_KEY  = "X96byYoD74M3h_f8y";     // ← replace with your Public Key
 // Template variables expected: {{from_name}}, {{from_email}}, {{message}}
 
 function Contact() {
